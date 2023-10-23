@@ -305,6 +305,7 @@ impl Vm {
         let mut next_instr_ptr: usize;
         let mut variable: Variable;
         let mut reference: usize;
+        let mut num_args: usize = 0;
         let mut size: usize;
         let mut scope: usize;
         let mut base: usize;
@@ -335,6 +336,7 @@ impl Vm {
                     size = operand as usize;
                     reference = self.call_stack_ptr - size;
                     self.push_var_stack(Variable { reference, size });
+                    num_args += 1;
                     self.instr_ptr += 1;
                 }
                 Some(Opcode::LOAD_VAL) => {
@@ -431,7 +433,9 @@ impl Vm {
                         ret_val = self.pop_call_stack(size);
                     }
                     // Pop the current scope off the scope stack
-                    self.var_stack_ptr = self.pop_scope_stack();
+                    self.var_stack_ptr = self.pop_scope_stack() - num_args;
+                    // Clear the number of arguments after returning
+                    num_args = 0;
                     // Adjust the stack pointer
                     self.call_stack_ptr = self.frame_ptr;
                     // Pop the last frame pointer off the stack
@@ -456,12 +460,12 @@ impl Vm {
                 }
             }
 
-            println!("{instr_line} {opcode_num}");
-            self.print_call_stack();
-            self.print_eval_stack();
-            self.print_var_stack();
-            self.print_scope_stack();
-            instr_line += 1;
+            // println!("{instr_line} {opcode_num}");
+            // self.print_call_stack();
+            // self.print_eval_stack();
+            // self.print_var_stack();
+            // self.print_scope_stack();
+            // instr_line += 1;
         }
     }
 }
